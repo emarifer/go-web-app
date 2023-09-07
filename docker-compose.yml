@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  db:
+    container_name: go-app-mongodb
+    image: mongo:4.0.4
+    env_file:
+      - ./.env
+    volumes:
+      - ./app_data:/data/db
+    ports:
+      - 27017:27017
+
+volumes:
+  db:
+
+# ============================================================
+# docker exec -it go-app-mongodb bash
+# 
+# mongo admin -u admin -p password --authenticationDatabase admin
+# 
+# mongodb://root:root@localhost:27017/gomongodb?authSource=admin
+
+# use go_mongodb (crea/usa go_mongodb)
+# show dbs
+# show collections
+# db.users.insertOne({"name":"Julieta"})
+# db.users.find()
+# db.users.remove({"_id" : ObjectId("64f9be6d3f287f5b74013f38")})
+
+# ============================================================
+# https://dev.to/arantespp/mongodb-shell-commands-running-on-docker-101-1l73
+# https://stackoverflow.com/questions/8866041/how-can-i-list-all-collections-in-the-mongodb-shell
+# https://stackoverflow.com/questions/24985684/mongodb-show-all-contents-from-all-collections
+# https://www.tutorialspoint.com/how-to-delete-document-by-id-using-mongodb
