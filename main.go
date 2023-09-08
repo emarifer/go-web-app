@@ -34,6 +34,10 @@ func main() {
 /*
 https://github.com/FaztWeb/go-react-project
 
+USO DE PROXY EN EL packege.json PARA EVITAR TENER QUE CAMBIAR EN
+EL FRONTEND LA URL DE DESARROLLO POR LA DE DEPLOY. VER:
+https://youtu.be/zlrnwGZMBbU?si=BaDbpfALXLr3gS0X&t=1662
+
 https://github.com/gofiber/fiber/blob/master/.github/README_es.md
 https://docs.gofiber.io/
 https://gofiber.io/
