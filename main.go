@@ -21,9 +21,12 @@ type User struct {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
+	// fmt.Println("ENV:", os.Getenv("ENV"))
+	if os.Getenv("ENV") == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 	mongodbAtlasUri := os.Getenv("MONGODB_ATLAS_URI")
 	mongodbName := os.Getenv("MONGO_INITDB_DATABASE")
@@ -110,4 +113,15 @@ https://codevoweb.com/build-a-simple-api-in-golang-using-fiber-and-sqlite/
 https://github.com/wpcodevo/golang-fiber-sqlite
 
 https://github.com/Prakashdeveloper03/Fiber-todo-app
+
+Where is the password for the cluster? RECUPERAR CONTRASEÑA DEL CLUSTER DE MONGODB. VER (NO SE PUEDE):
+https://www.mongodb.com/community/forums/t/where-is-the-password-for-the-cluster/112742/4
+HAY QUE CREAR UNA NUEVA CONTRASEÑA PARA ESE USARIO DEL CLUSTER O CREAR UN
+NUEVO USARIO PARA EL CLUSTER
+
+# PASAR VARIABLES DE ENTORNO A LA EJECUCIÓN DE GO Y
+# USO DE VARIABLES DE ENTORNO CON «AIR» PARA DIFERENCIAR DEV/PROD. VER:
+# https://github.com/cosmtrek/air/issues/58#issuecomment-898537034
+# https://github.com/cosmtrek/air/issues/376#issuecomment-1416509805
+# https://gobyexample.com/environment-variables
 */
