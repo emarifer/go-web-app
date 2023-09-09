@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -20,10 +21,12 @@ type User struct {
 }
 
 func main() {
-	envFile, _ := godotenv.Read(".env")
-	// mongodbUri := envFile["MONGODB_URI"] // Local DB
-	mongodbAtlasUri := envFile["MONGODB_ATLAS_URI"]
-	mongodbName := envFile["MONGO_INITDB_DATABASE"]
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	mongodbAtlasUri := os.Getenv("MONGODB_ATLAS_URI")
+	mongodbName := os.Getenv("MONGO_INITDB_DATABASE")
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodbAtlasUri))
 	if err != nil {
@@ -84,7 +87,7 @@ func main() {
 		})
 	})
 
-	port := envFile["PORT"]
+	port := os.Getenv("PORT")
 	log.Printf("🚀 Starting up on port %s", port)
 	app.Listen(fmt.Sprintf(":%s", port))
 }
