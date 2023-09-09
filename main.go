@@ -1,13 +1,35 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type User struct {
+	Id   primitive.ObjectID `json:"_id" bson:"_id"`
+	Name string             `json:"name"`
+}
+
 func main() {
+	envFile, _ := godotenv.Read(".env")
+	// mongodbUri := envFile["MONGODB_URI"] // Local DB
+	mongodbAtlasUri := envFile["MONGODB_ATLAS_URI"]
+	mongodbName := envFile["MONGO_INITDB_DATABASE"]
+
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodbAtlasUri))
+	if err != nil {
+		panic(err)
+	}
+
 	app := fiber.New()
 
 	app.Use(cors.New())
@@ -22,13 +44,49 @@ func main() {
 	})
 
 	app.Get("/users", func(c *fiber.Ctx) error {
+		var users []User
+
+		coll := client.Database(mongodbName).Collection("users")
+		// Ordenación descendente según campo (en este caso alfabética)
+		// https://www.mongodb.com/docs/drivers/go/current/fundamentals/crud/read-operations/sort/#descending
+		opts := options.Find().SetSort(bson.D{{Key: "name", Value: -1}})
+		result, err := coll.Find(context.TODO(), bson.M{}, opts)
+		if err != nil {
+			panic(err)
+		}
+
+		for result.Next(context.TODO()) {
+			var user User
+			result.Decode(&user)
+			users = append(users, user)
+		}
+
 		return c.Status(200).JSON(fiber.Map{
-			"data": "User List from the backend",
+			"data": users,
 		})
 	})
 
-	log.Println("🚀 Starting up on port 5500")
-	app.Listen(":5500")
+	app.Post("/users", func(c *fiber.Ctx) error {
+		var user User
+		c.BodyParser(&user)
+
+		coll := client.Database(mongodbName).Collection("users")
+		result, err := coll.InsertOne(context.TODO(), bson.D{{
+			Key:   "name",
+			Value: user.Name,
+		}})
+		if err != nil {
+			panic(err)
+		}
+
+		return c.Status(201).JSON(fiber.Map{
+			"data": result,
+		})
+	})
+
+	port := envFile["PORT"]
+	log.Printf("🚀 Starting up on port %s", port)
+	app.Listen(fmt.Sprintf(":%s", port))
 }
 
 /*
